@@ -1,0 +1,39 @@
+doctype html
+html(lang="ru") 
+    head
+        meta(charset="utf-8")
+        title Fifteen
+        meta(name="viewport" content="width=device-width, initial-scale=1.0")
+        link(rel="stylesheet" href="/css/reset.css")
+        link(rel="stylesheet" href="/css/index.css")
+    body
+      - var values = new Array(16).fill(0).map((_, index) => index + 1);
+      .page
+        h1 Игра в "Пятнашки"
+        .start-game
+        button.button#start Начать играть 
+        button.button#rules Правила игры
+        .win-container.invisible  
+          h1.win Поздравляем, вы победили
+          .win-animation
+        .rules
+          ul.list-rules.invisible
+            li.rule
+              h3 Правило 1
+              p Что бы начать игру нажмите кнопку "Начать"
+            li.rule
+              h3 Правило 2
+              p После начала игры нажмите кнопку "Перемешать"
+            li.rule
+              h3 Правило 3
+              p Расставьте ячейки таким образом, что бы цифры шли по порядку
+            li.rule
+              h3 Правило 4
+              p Игра продолжается до победы
+        .fifteen.invisible#fifteen
+          each val in values
+            button.item(data-matrix-id=val)
+              span.itemVal= val
+        button.button.invisible#shuffle Перемешать
+
+        script(type="module" src="/js/index.js")

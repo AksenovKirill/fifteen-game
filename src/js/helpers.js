@@ -1,7 +1,9 @@
-import { isWon, addWonClass } from './win.js';
-import { container } from './const.js';
+import {isWon, addWonClass} from './win.js';
+import {container} from './const.js';
+import {blankItem} from './position.js';
 
-const items = Array.from(container.querySelectorAll(".item"));
+const items = Array.from(container.querySelectorAll('.item'));
+let blockedCoords = null;
 
 export const getMatrix = (array) => {
   const matrix = [[], [], [], []];
@@ -68,3 +70,30 @@ export const swap = (coords1, coords2, matrix) => {
     addWonClass();
   }
 };
+
+export const randomSwap = (matrix) => {
+  const blankCoords = findCoordinateByNumber(blankItem, matrix);
+  const validCoords = findValidCoords({
+    blankCoords,
+    matrix,
+    blockedCoords,
+  });
+  const swapCoords = validCoords[Math.floor(Math.random() * validCoords.length)];
+  swap(blankCoords, swapCoords, matrix);
+  blockedCoords = blankCoords;
+};
+
+const findValidCoords = ({blankCoords, matrix, blockedCoords}) => {
+  const validCoords = [];
+  for (let y = 0; y < matrix.length; y++) {
+    for (let x = 0; x < matrix[y].length; x++) {
+      if (isValidForSwap({x, y}, blankCoords)) {
+        if (!blockedCoords ||
+          !(blockedCoords.x === x && blockedCoords.y === y)) {
+          validCoords.push({x, y});
+        }
+      }
+    }
+  }
+  return validCoords;
+}

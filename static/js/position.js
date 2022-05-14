@@ -1,9 +1,14 @@
-import { findCoordinateByNumber, setPositionItem, swap, getMatrix, isValidForSwap, shuffleArray } from './helpers.js';
+import { findCoordinateByNumber, setPositionItem, swap, getMatrix, isValidForSwap, shuffleArray, randomSwap } from './helpers.js';
 import { container } from './const.js';
 
 export const items = Array.from(container.querySelectorAll('.item'));
 export const countItems = 16;
-const blankItem = 16;
+export const blankItem = 16;
+let isShuffled = false;
+const shuffleClassName = 'pageShuffle';
+const pageWrap = document.querySelector('#page');
+const maxShuffleCount = 70;
+let timer;
 
 items[countItems - 1].style.display = 'none';
 let dataSetItems = items.map((item) => Number(item.dataset.matrixId));
@@ -13,9 +18,15 @@ setPositionItem(matrix);
 
 export const changePositionByClick = (event) => {
   const item = event.target.closest('.item');
+
+  if(isShuffled) {
+    return;
+  }
+
   if (!item) {
     return;
   }
+
   const itemNumber = Number(item.dataset.matrixId);
   const itemCoords = findCoordinateByNumber(itemNumber, matrix);
   const blankCoords = findCoordinateByNumber(blankItem, matrix);
@@ -29,16 +40,23 @@ export const changePositionByClick = (event) => {
 };
 
 export const changePositionByKeyBoard = (event) => {
+  if(isShuffled) {
+    return;
+  }
+
   if (!event.key.includes('Arrow')) {
     return;
   }
+
   const blankCoords = findCoordinateByNumber(blankItem, matrix);
   const itemCoords = {
     x: blankCoords.x,
     y: blankCoords.y,
   };
+
   const direction = event.key.split('Arrow')[1].toLowerCase();
   const maxIndexMatrix = matrix.length;
+
   switch (direction) {
     case 'up':
       itemCoords.y += 1;
@@ -66,8 +84,25 @@ export const changePositionByKeyBoard = (event) => {
 };
 
 export const getShuffle = () => {
-  const flatMatrix = matrix.flat();
-  const shuffledArray = shuffleArray(flatMatrix);
-  matrix = getMatrix(shuffledArray);
-  setPositionItem(matrix);
+  if(isShuffled){
+    return;
+  }
+
+  isShuffled = true;
+  let shuffleCount = 0;
+  clearInterval(timer);
+  pageWrap.classList.add(shuffleClassName);
+
+  timer = setInterval(() => {
+    randomSwap(matrix);
+    setPositionItem(matrix);
+
+    shuffleCount += 1;
+
+    if (shuffleCount >= maxShuffleCount) {
+      pageWrap.classList.remove(shuffleClassName);
+      clearInterval(timer);
+      isShuffled = false;
+    }
+  }, 50);
 };
